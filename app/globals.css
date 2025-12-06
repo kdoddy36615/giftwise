@@ -1,9 +1,21 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+  --color-background: #0f0f0f;
+  --color-card: #141414;
+  --color-border: #2d2d2d;
+  --color-text: #e4e4e7;
+  --color-text-muted: #a1a1aa;
+  --color-accent: #6366f1;
+  --color-accent-hover: #5558e3;
+  --color-danger: #dc2626;
+}
 
 @layer base {
   body {
-    @apply bg-[#0f0f0f] text-[#e4e4e7] antialiased;
+    background-color: var(--color-background);
+    color: var(--color-text);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 }
