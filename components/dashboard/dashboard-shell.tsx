@@ -14,7 +14,6 @@ import { DashboardErrorBoundary } from '@/components/error-boundary'
 import { GiftListTabs } from './gift-list-tabs'
 import { FilterBar } from './filter-bar'
 import { SelectedItemsBanner } from './selected-items-banner'
-import { ActionButtons } from './action-buttons'
 import { TotalsDisplay } from './totals-display'
 import { GiftItemsTable } from './gift-items-table'
 import { ItemFormModal } from '@/components/modals/item-form-modal'
@@ -226,46 +225,40 @@ export function DashboardShell({ lists, items, links }: DashboardShellProps) {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Filter Bar */}
-      <FilterBar activeFilter={filter} onFilterChange={setFilter} />
+    <div className="space-y-4">
+      {/* Tabs + Filter + Add Button in header row */}
+      <div className="flex justify-between items-start gap-4 flex-wrap">
+        <DashboardErrorBoundary>
+          <GiftListTabs
+            lists={lists}
+            activeListId={activeListId || ''}
+            selectionCounts={selectionCounts}
+            onTabChange={setActiveListId}
+            onCreateList={handleCreateList}
+          />
+        </DashboardErrorBoundary>
 
-      {/* Gift List Tabs */}
-      <DashboardErrorBoundary>
-        <GiftListTabs
-          lists={lists}
-          activeListId={activeListId || ''}
-          selectionCounts={selectionCounts}
-          onTabChange={setActiveListId}
-          onCreateList={handleCreateList}
+        <div className="flex gap-4 items-center">
+          <FilterBar activeFilter={filter} onFilterChange={setFilter} />
+          <button
+            onClick={handleAddItem}
+            className="bg-[#6366f1] hover:bg-[#5558e3] text-white font-semibold px-4 py-2 rounded-lg transition-colors text-sm whitespace-nowrap"
+          >
+            + Add Item
+          </button>
+        </div>
+      </div>
+
+      {/* Selected Items Banner - only shows when items selected */}
+      {selectedCount > 0 && (
+        <SelectedItemsBanner
+          selectedItems={selectedItems}
+          onOpenCheapest={handleOpenCheapest}
+          onMarkPurchased={handleMarkPurchased}
+          onClearSelection={handleClearSelection}
+          isMarkingPurchased={isMarkingPurchased}
         />
-      </DashboardErrorBoundary>
-
-      {/* Selected Items Banner */}
-      <SelectedItemsBanner
-        selectedItems={selectedItems}
-        onOpenCheapest={handleOpenCheapest}
-        onMarkPurchased={handleMarkPurchased}
-        onClearSelection={handleClearSelection}
-        isMarkingPurchased={isMarkingPurchased}
-      />
-
-      {/* Action Buttons */}
-      <ActionButtons
-        selectedCount={selectedCount}
-        onSelectAll={handleSelectAll}
-        onSelectRequired={handleSelectRequired}
-        onSelectOptional={handleSelectOptional}
-        onClearSelection={handleClearSelection}
-        onOpenCheapest={handleOpenCheapest}
-        onOpenHighend={handleOpenHighend}
-        onOpenAmazon={handleOpenAmazon}
-        onMarkPurchased={handleMarkPurchased}
-        onUnmarkPurchased={handleUnmarkPurchased}
-        onAddItem={handleAddItem}
-        isMarkingPurchased={isMarkingPurchased}
-        isUnmarking={isUnmarking}
-      />
+      )}
 
       {/* Empty State for List with No Items */}
       <DashboardErrorBoundary>
