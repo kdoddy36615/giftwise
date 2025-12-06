@@ -1,36 +1,41 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# GiftAssist - AI-Powered Gift Planning
 
-## Getting Started
+AI-powered gift planning application with conversational assistant, price comparison, and smart shopping workflows.
 
-First, run the development server:
+## Features
 
-```bash
+- **AI Gift Assistant** - Ask questions about recipients, get personalized gift suggestions
+- **Quick Add** - Enter just the item name, auto-fetch details
+- **Multi-List Management** - Organize gifts by person
+- **Price Comparison** - Compare prices across multiple retailers
+- **Bulk Actions** - Open cheapest/premium options, mark purchased
+- **Smart Totals** - Track required vs optional spending
+
+## Quick Start
+
+\`\`\`bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+\`\`\`
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Tech Stack
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- Next.js 16 + TypeScript
+- Supabase (PostgreSQL + Auth)
+- OpenAI GPT-4
+- TailwindCSS
+- Vercel
 
-## Learn More
+## Branching Strategy
 
-To learn more about Next.js, take a look at the following resources:
+- \`main\` - Production
+- \`dev\` - Development
+- \`feature/*\` - Feature branches
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Documentation
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- \`CLAUDE.md\` - Project instructions
+- \`CODING-STANDARDS.md\` - Code guidelines
+- \`reference/\` - MVP reference
