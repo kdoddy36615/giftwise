@@ -54,6 +54,7 @@ export async function markItemsComplete(
 
     // 3. Check all items belong to current user
     const allOwned = items.every(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (item: any) => item.gift_lists.user_id === user.id
     )
 

@@ -3,11 +3,16 @@
 import { useCallback } from 'react'
 import type { GiftItem, RetailerLink } from '@/types/database'
 import type { BulkOpenTarget } from '@/types/dashboard'
+import { BULK_OPERATION } from '@/lib/constants/timing'
 
 export type GiftItemWithLinks = GiftItem & {
   retailer_links: RetailerLink[]
 }
 
+/**
+ * Hook for bulk opening retailer links in new tabs
+ * @returns Object with openTabs function
+ */
 export function useBulkOpen() {
   const openTabs = useCallback(
     (items: GiftItemWithLinks[], target: BulkOpenTarget) => {
@@ -32,11 +37,14 @@ export function useBulkOpen() {
         }
       })
 
+      // Respect maximum tabs limit
+      const tabsToOpen = linksToOpen.slice(0, BULK_OPERATION.MAX_TABS)
+
       // Open all links in new tabs with staggered delay to avoid popup blocker
-      linksToOpen.forEach((link, index) => {
+      tabsToOpen.forEach((link, index) => {
         setTimeout(() => {
           window.open(link.url, '_blank', 'noopener,noreferrer')
-        }, index * 300)
+        }, index * BULK_OPERATION.TAB_OPEN_DELAY)
       })
     },
     []

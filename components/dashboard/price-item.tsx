@@ -1,6 +1,7 @@
 'use client'
 
 import type { RetailerLink } from '@/types/database'
+import { sanitizeUrl } from '@/lib/utils/url-validator'
 
 export interface PriceItemProps {
   link: RetailerLink
@@ -9,10 +10,11 @@ export interface PriceItemProps {
 export function PriceItem({ link }: PriceItemProps) {
   const priceColor = link.is_best_price ? 'text-[#10b981]' : 'text-[#6366f1]'
   const price = link.price ? `$${link.price}` : 'N/A'
+  const safeUrl = sanitizeUrl(link.url)
 
   return (
     <a
-      href={link.url}
+      href={safeUrl}
       target="_blank"
       rel="noopener noreferrer"
       onClick={(e) => e.stopPropagation()}

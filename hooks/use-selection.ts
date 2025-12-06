@@ -31,7 +31,8 @@ export function useSelection(lists: GiftList[], itemsWithLinks: GiftItemWithLink
   const toggleSelection = useCallback((listId: string, itemId: string) => {
     setSelections((prev) => {
       const newSelection = new Map(prev)
-      const listSelection = newSelection.get(listId) || new Set<string>()
+      // Create a new Set to avoid mutating previous state
+      const listSelection = new Set(newSelection.get(listId) || new Set<string>())
 
       if (listSelection.has(itemId)) {
         listSelection.delete(itemId)

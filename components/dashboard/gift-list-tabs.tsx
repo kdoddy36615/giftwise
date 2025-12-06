@@ -7,6 +7,7 @@ export interface GiftListTabsProps {
   activeListId: string
   onTabChange: (listId: string) => void
   selectionCounts: Map<string, number>
+  onCreateList: () => void
 }
 
 export function GiftListTabs({
@@ -14,6 +15,7 @@ export function GiftListTabs({
   activeListId,
   onTabChange,
   selectionCounts,
+  onCreateList,
 }: GiftListTabsProps) {
   return (
     <div className="flex gap-3 px-5 pb-4">
@@ -50,6 +52,14 @@ export function GiftListTabs({
           </button>
         )
       })}
+
+      {/* New List Button */}
+      <button
+        onClick={onCreateList}
+        className="px-7 py-3 font-bold text-lg rounded-lg border-2 border-dashed border-[#3d3d3d] text-[#a1a1aa] hover:border-[#6366f1] hover:text-[#6366f1] hover:-translate-y-0.5 transition-all"
+      >
+        + New List
+      </button>
     </div>
   )
 }
