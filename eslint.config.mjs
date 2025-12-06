@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Ignore reference MVP files (used for design reference only)
+    "reference/**",
   ]),
 ]);
 
