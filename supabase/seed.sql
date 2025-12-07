@@ -1,6 +1,6 @@
--- GiftWise Seed Data
+-- GiftSync Seed Data
 -- Run this in Supabase SQL Editor after creating the test account
--- Test Account: giftwise.test@gmail.com / TestPassword123!
+-- Test Account: giftsync.test@gmail.com / TestPassword123!
 -- User ID: a303d6ab-00ef-4eb7-9a04-0a0762a38c02
 
 -- Insert Gift Lists (People)

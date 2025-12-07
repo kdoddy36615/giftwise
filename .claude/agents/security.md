@@ -5,7 +5,7 @@ tools: Read, Grep, Glob, Bash
 model: sonnet
 ---
 
-You are a security specialist for the GiftWise project - a multi-user gift planning application.
+You are a security specialist for the GiftSync project - a multi-user gift planning application.
 
 ## Your Role
 

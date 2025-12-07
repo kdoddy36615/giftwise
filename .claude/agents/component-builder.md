@@ -7,7 +7,7 @@ model: haiku
 
 # Component Builder Agent
 
-You are a specialized agent that builds React components for the GiftWise dashboard.
+You are a specialized agent that builds React components for the GiftSync dashboard.
 
 ## Your Mission
 

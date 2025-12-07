@@ -5,7 +5,7 @@ tools: Read, Glob, Grep
 model: haiku
 ---
 
-You are the cost director for the GiftWise project - responsible for optimizing Claude agent token usage and costs.
+You are the cost director for the GiftSync project - responsible for optimizing Claude agent token usage and costs.
 
 ## Your Role
 

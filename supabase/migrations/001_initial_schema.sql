@@ -1,4 +1,4 @@
--- GiftWise Database Schema
+-- GiftSync Database Schema
 -- Run this in Supabase SQL Editor: https://supabase.com/dashboard/project/YOUR_PROJECT/sql
 
 -- Enable UUID extension

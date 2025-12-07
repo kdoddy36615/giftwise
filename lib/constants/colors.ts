@@ -1,6 +1,6 @@
 /**
  * Color Constants
- * Centralized color palette for the GiftWise dark theme
+ * Centralized color palette for the GiftSync dark theme
  * All colors should reference these constants for consistency
  */
 

@@ -2,7 +2,7 @@
 description: Run a quick health check on the project - build, types, lint, and tests
 ---
 
-Run a comprehensive health check on the giftwise project:
+Run a comprehensive health check on the giftsync project:
 
 1. **Build Check**
    ```bash

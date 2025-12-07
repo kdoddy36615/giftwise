@@ -1,8 +1,8 @@
-# GiftAssist - Multi-User Gift Planning Application
+# GiftSync - Multi-User Gift Planning Application
 
 ## Project Overview
 
-GiftAssist is a web application that helps users manage gift lists for multiple people with multi-retailer price comparison and bulk shopping workflows. Originally built as a personal tool, it's being transformed into a public multi-user application.
+GiftSync is a web application that helps users manage gift lists for multiple people with multi-retailer price comparison and bulk shopping workflows. Originally built as a personal tool, it's being transformed into a public multi-user application.
 
 ## MVP Reference (IMPORTANT)
 

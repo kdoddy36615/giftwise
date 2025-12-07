@@ -2,7 +2,7 @@
 description: Run QA tests on recent features using the qa-tester agent
 ---
 
-Use the qa-tester agent to test recent features in the giftwise project.
+Use the qa-tester agent to test recent features in the giftsync project.
 
 Focus on:
 1. Features marked as complete in feature-status.json

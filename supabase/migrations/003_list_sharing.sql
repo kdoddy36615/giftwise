@@ -1,4 +1,4 @@
--- GiftWise List Sharing / Collaborative Lists
+-- GiftSync List Sharing / Collaborative Lists
 -- Allows multiple users to share and edit the same gift lists
 
 -- ===========================================

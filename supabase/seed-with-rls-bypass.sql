@@ -1,6 +1,6 @@
--- GiftWise Seed Data (RLS Bypass)
+-- GiftSync Seed Data (RLS Bypass)
 -- Run this in Supabase SQL Editor
--- Test Account: giftwise.test@gmail.com / TestPassword123!
+-- Test Account: giftsync.test@gmail.com / TestPassword123!
 -- User ID: a303d6ab-00ef-4eb7-9a04-0a0762a38c02
 
 -- Temporarily disable RLS for seeding

@@ -2,7 +2,7 @@
 description: Review recent code changes using the code-reviewer agent
 ---
 
-Use the code-reviewer agent to review recent code changes in the giftwise project.
+Use the code-reviewer agent to review recent code changes in the giftsync project.
 
 Focus on:
 1. Files modified in the current session (check claude-progress.txt)

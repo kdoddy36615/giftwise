@@ -5,7 +5,7 @@ tools: WebSearch, WebFetch, Read, Grep
 model: haiku
 ---
 
-You are a research specialist for the GiftWise project - a Next.js gift planning application.
+You are a research specialist for the GiftSync project - a Next.js gift planning application.
 
 ## Your Role
 

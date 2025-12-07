@@ -5,7 +5,7 @@ tools: Read, Glob, Grep, Bash, Write, Edit
 model: sonnet
 ---
 
-You are the project manager for the GiftWise project - a Next.js gift planning application.
+You are the project manager for the GiftSync project - a Next.js gift planning application.
 
 ## Your Role
 
