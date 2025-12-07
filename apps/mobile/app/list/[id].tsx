@@ -16,17 +16,17 @@ import { getSupabase } from '../../lib/supabase/client'
 interface GiftItem {
   id: string
   name: string
-  description: string | null
+  notes: string | null
   status: 'required' | 'optional'
-  min_price: number | null
-  max_price: number | null
+  price_low: number | null
+  price_high: number | null
   is_completed: boolean
 }
 
 interface GiftList {
   id: string
   name: string
-  description: string | null
+  color: string
 }
 
 export default function ListDetailScreen() {
@@ -46,7 +46,7 @@ export default function ListDetailScreen() {
       // Fetch list details
       const { data: listData, error: listError } = await supabase
         .from('gift_lists')
-        .select('id, name, description')
+        .select('id, name, color')
         .eq('id', id)
         .single()
 
@@ -56,7 +56,7 @@ export default function ListDetailScreen() {
       // Fetch items
       const { data: itemsData, error: itemsError } = await supabase
         .from('gift_items')
-        .select('id, name, description, status, min_price, max_price, is_completed')
+        .select('id, name, notes, status, price_low, price_high, is_completed')
         .eq('list_id', id)
         .order('sort_order', { ascending: true })
 
@@ -132,19 +132,19 @@ export default function ListDetailScreen() {
         </View>
       </View>
 
-      {item.description && (
+      {item.notes && (
         <Text style={styles.itemDescription} numberOfLines={2}>
-          {item.description}
+          {item.notes}
         </Text>
       )}
 
-      {(item.min_price || item.max_price) && (
+      {(item.price_low || item.price_high) && (
         <Text style={styles.itemPrice}>
-          {item.min_price && item.max_price
-            ? `$${item.min_price} - $${item.max_price}`
-            : item.min_price
-            ? `$${item.min_price}+`
-            : `Up to $${item.max_price}`}
+          {item.price_low && item.price_high
+            ? `$${item.price_low} - $${item.price_high}`
+            : item.price_low
+            ? `$${item.price_low}+`
+            : `Up to $${item.price_high}`}
         </Text>
       )}
 

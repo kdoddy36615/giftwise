@@ -16,7 +16,7 @@ import { getSupabase } from '../../lib/supabase/client'
 interface GiftList {
   id: string
   name: string
-  description: string | null
+  color: string
   created_at: string
   item_count?: number
 }
@@ -36,7 +36,7 @@ export default function DashboardScreen() {
         .select(`
           id,
           name,
-          description,
+          color,
           created_at,
           gift_items(count)
         `)
@@ -52,7 +52,14 @@ export default function DashboardScreen() {
       setLists(listsWithCount)
       setError('')
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch lists')
+      console.error('Fetch lists error:', err)
+      if (err instanceof Error) {
+        setError(err.message)
+      } else if (typeof err === 'object' && err !== null) {
+        setError(JSON.stringify(err))
+      } else {
+        setError(String(err))
+      }
     } finally {
       setIsLoading(false)
       setIsRefreshing(false)
@@ -73,15 +80,11 @@ export default function DashboardScreen() {
       style={({ pressed }) => [
         styles.card,
         pressed && styles.cardPressed,
+        { borderLeftColor: item.color || colors.accent, borderLeftWidth: 4 },
       ]}
       onPress={() => router.push(`/list/${item.id}`)}
     >
       <Text style={styles.cardTitle}>{item.name}</Text>
-      {item.description && (
-        <Text style={styles.cardDescription} numberOfLines={2}>
-          {item.description}
-        </Text>
-      )}
       <Text style={styles.cardMeta}>
         {item.item_count || 0} items
       </Text>
