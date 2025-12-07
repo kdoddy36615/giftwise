@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { withServerAction, validateRequired, validateStringLength } from './server-action-helpers'
 
 describe('Server Action Helpers', () => {
@@ -53,7 +53,7 @@ describe('Server Action Helpers', () => {
     })
 
     it('should return error when field is missing', () => {
-      const data = { name: 'John' }
+      const data: Record<string, unknown> = { name: 'John' }
       const result = validateRequired(data, ['name', 'email'])
 
       expect(result).not.toBe(null)
@@ -94,15 +94,15 @@ describe('Server Action Helpers', () => {
     })
 
     it('should return error when field is null', () => {
-      const data = { name: null, email: 'john@example.com' }
-      const result = validateRequired(data as any, ['name', 'email'])
+      const data: Record<string, unknown> = { name: null, email: 'john@example.com' }
+      const result = validateRequired(data, ['name', 'email'])
 
       expect(result).not.toBe(null)
       expect(result?.error).toBe('name is required')
     })
 
     it('should return error when field is undefined', () => {
-      const data = { email: 'john@example.com' }
+      const data: Record<string, unknown> = { email: 'john@example.com' }
       const result = validateRequired(data, ['name', 'email'])
 
       expect(result).not.toBe(null)

@@ -2,9 +2,8 @@
 
 import { createClient } from '@/lib/supabase/server'
 import type { GiftList } from '@/types/database'
-import type { GiftListInsert } from '@/lib/types/supabase-helpers'
 import { logger } from '@/lib/utils/logger'
-import { validateListName, VALIDATION_MESSAGES } from '@/lib/constants/validation'
+import { validateListName } from '@/lib/constants/validation'
 import { DEFAULT_COLORS } from '@/lib/constants/colors'
 
 export interface CreateListInput {

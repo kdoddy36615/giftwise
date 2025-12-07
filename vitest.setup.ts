@@ -91,11 +91,14 @@ Object.defineProperty(window, 'open', {
 
 // Mock IntersectionObserver
 global.IntersectionObserver = class IntersectionObserver {
+  root = null
+  rootMargin = ''
+  thresholds: readonly number[] = []
   constructor() {}
   disconnect() {}
   observe() {}
-  takeRecords() {
+  takeRecords(): IntersectionObserverEntry[] {
     return []
   }
   unobserve() {}
-} as any
+}

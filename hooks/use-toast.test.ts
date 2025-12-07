@@ -148,7 +148,7 @@ describe('useToast', () => {
   it('should return toast ID from helper methods', () => {
     const { result } = renderHook(() => useToast())
 
-    let id: string
+    let id = ''
 
     act(() => {
       id = result.current.success('Success message')

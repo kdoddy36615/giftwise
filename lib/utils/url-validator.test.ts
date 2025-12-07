@@ -32,9 +32,9 @@ describe('URL Validator', () => {
     })
 
     it('should reject non-string input', () => {
-      expect(isValidHttpUrl(null as any)).toBe(false)
-      expect(isValidHttpUrl(undefined as any)).toBe(false)
-      expect(isValidHttpUrl(123 as any)).toBe(false)
+      expect(isValidHttpUrl(null as unknown as string)).toBe(false)
+      expect(isValidHttpUrl(undefined as unknown as string)).toBe(false)
+      expect(isValidHttpUrl(123 as unknown as string)).toBe(false)
     })
 
     it('should reject malformed URLs', () => {
@@ -94,8 +94,8 @@ describe('URL Validator', () => {
     })
 
     it('should return null for non-string input', () => {
-      expect(validateUrl(null as any)).toBe(null)
-      expect(validateUrl(undefined as any)).toBe(null)
+      expect(validateUrl(null as unknown as string)).toBe(null)
+      expect(validateUrl(undefined as unknown as string)).toBe(null)
     })
   })
 })

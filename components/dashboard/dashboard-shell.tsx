@@ -235,6 +235,7 @@ export function DashboardShell({ lists, items, links }: DashboardShellProps) {
             selectionCounts={selectionCounts}
             onTabChange={setActiveListId}
             onCreateList={handleCreateList}
+            onEditList={handleEditList}
           />
         </DashboardErrorBoundary>
 

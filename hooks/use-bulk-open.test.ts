@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { renderHook, act, waitFor } from '@testing-library/react'
+import { renderHook, act } from '@testing-library/react'
 import { useBulkOpen, type GiftItemWithLinks } from './use-bulk-open'
 import type { RetailerLink } from '@/types/database'
 import { BULK_OPERATION } from '@/lib/constants/timing'
@@ -8,13 +8,15 @@ describe('useBulkOpen', () => {
   let windowOpenSpy: ReturnType<typeof vi.spyOn>
 
   beforeEach(() => {
+    vi.clearAllMocks()
     vi.useFakeTimers()
     windowOpenSpy = vi.spyOn(window, 'open').mockImplementation(() => null)
   })
 
   afterEach(() => {
-    vi.restoreAllMocks()
+    vi.runOnlyPendingTimers()
     vi.useRealTimers()
+    vi.restoreAllMocks()
   })
 
   const mockLinks: RetailerLink[] = [
@@ -44,13 +46,19 @@ describe('useBulkOpen', () => {
     {
       id: 'item-1',
       list_id: 'list-1',
-      user_id: 'user-1',
-      item_name: 'Laptop',
+      name: 'Laptop',
       status: 'required',
       price_low: 100,
       price_high: 150,
       is_completed: false,
       created_at: '2024-01-01',
+      updated_at: '2024-01-01',
+      priority: 1,
+      notes: null,
+      value_tag: null,
+      product_images: null,
+      research_content: null,
+      sort_order: 0,
       retailer_links: mockLinks,
     },
   ]
@@ -118,23 +126,27 @@ describe('useBulkOpen', () => {
 
     const { result } = renderHook(() => useBulkOpen())
 
+    // Call openTabs - this schedules setTimeout calls
     act(() => {
       result.current.openTabs(multiItems, 'cheapest')
     })
 
-    // First tab opens immediately
+    // No timers have fired yet (all are pending)
+    expect(windowOpenSpy).toHaveBeenCalledTimes(0)
+
+    // First tab opens immediately (0 * delay = 0ms)
     act(() => {
-      vi.advanceTimersByTime(0)
+      vi.advanceTimersByTime(1)
     })
     expect(windowOpenSpy).toHaveBeenCalledTimes(1)
 
-    // Second tab opens after TAB_OPEN_DELAY
+    // Second tab opens after TAB_OPEN_DELAY (1 * delay)
     act(() => {
       vi.advanceTimersByTime(BULK_OPERATION.TAB_OPEN_DELAY)
     })
     expect(windowOpenSpy).toHaveBeenCalledTimes(2)
 
-    // Third tab opens after another TAB_OPEN_DELAY
+    // Third tab opens after another TAB_OPEN_DELAY (2 * delay)
     act(() => {
       vi.advanceTimersByTime(BULK_OPERATION.TAB_OPEN_DELAY)
     })
@@ -153,9 +165,6 @@ describe('useBulkOpen', () => {
 
     act(() => {
       result.current.openTabs(itemsWithoutLinks, 'cheapest')
-    })
-
-    act(() => {
       vi.runAllTimers()
     })
 
@@ -167,9 +176,6 @@ describe('useBulkOpen', () => {
 
     act(() => {
       result.current.openTabs([], 'cheapest')
-    })
-
-    act(() => {
       vi.runAllTimers()
     })
 
@@ -227,9 +233,6 @@ describe('useBulkOpen', () => {
 
     act(() => {
       result.current.openTabs(mixedItems, 'cheapest')
-    })
-
-    act(() => {
       vi.runAllTimers()
     })
 

@@ -1,11 +1,25 @@
 import OpenAI from 'openai'
 
-if (!process.env.OPENAI_API_KEY) {
-  throw new Error('Missing OPENAI_API_KEY environment variable')
+// Lazy-load OpenAI client to allow builds without API key
+let _openai: OpenAI | null = null
+
+export function getOpenAIClient(): OpenAI {
+  if (!_openai) {
+    if (!process.env.OPENAI_API_KEY) {
+      throw new Error('Missing OPENAI_API_KEY environment variable')
+    }
+    _openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+    })
+  }
+  return _openai
 }
 
-export const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+// For backward compatibility
+export const openai = new Proxy({} as OpenAI, {
+  get: (target, prop) => {
+    return getOpenAIClient()[prop as keyof OpenAI]
+  },
 })
 
 // Token usage tracking (to stay under $10 budget)
@@ -16,28 +30,27 @@ export interface TokenUsage {
   estimatedCost: number
 }
 
-// GPT-4 Turbo pricing: $0.01 per 1K prompt tokens, $0.03 per 1K completion tokens
-export function calculateCost(usage: { prompt_tokens: number; completion_tokens: number }): number {
-  const promptCost = (usage.prompt_tokens / 1000) * 0.01
-  const completionCost = (usage.completion_tokens / 1000) * 0.03
-  return promptCost + completionCost
-}
+// Pricing for different models (per 1K tokens)
+const PRICING = {
+  'gpt-4o-mini': { input: 0.00015, output: 0.0006 },
+  'gpt-4-turbo-preview': { input: 0.01, output: 0.03 },
+  'gpt-4o': { input: 0.005, output: 0.015 },
+} as const
 
-// Track total spending (in production, this should be in a database)
-let totalSpending = 0
+export type ModelName = keyof typeof PRICING
 
-export function getTotalSpending(): number {
-  return totalSpending
-}
+// Default model for quick-add (67% cheaper than GPT-3.5)
+export const DEFAULT_MODEL: ModelName = 'gpt-4o-mini'
 
-export function addToSpending(cost: number): void {
-  totalSpending += cost
-}
-
-export function isWithinBudget(): boolean {
-  return totalSpending < 10 // $10 budget cap
-}
-
-export function getRemainingBudget(): number {
-  return Math.max(0, 10 - totalSpending)
+/**
+ * Calculate cost in cents for a given model and token usage
+ */
+export function calculateCost(
+  usage: { prompt_tokens: number; completion_tokens: number },
+  model: ModelName = DEFAULT_MODEL
+): number {
+  const pricing = PRICING[model]
+  const promptCost = (usage.prompt_tokens / 1000) * pricing.input
+  const completionCost = (usage.completion_tokens / 1000) * pricing.output
+  return (promptCost + completionCost) * 100 // Return cost in cents
 }

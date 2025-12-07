@@ -2,7 +2,6 @@
 
 import { createClient } from '@/lib/supabase/server'
 import type { GiftItem } from '@/types/database'
-import type { GiftItemInsert } from '@/lib/types/supabase-helpers'
 import type { CreateItemInput } from '@/types/forms'
 import { logger } from '@/lib/utils/logger'
 import { validateItemName } from '@/lib/constants/validation'

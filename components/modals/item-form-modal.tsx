@@ -6,9 +6,13 @@ import { Modal } from '@/components/ui/modal'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
+import { LoadingSpinner } from '@/components/ui/loading-spinner'
+import { AIPreviewCard } from './ai-preview-card'
+import { useQuickAdd } from '@/hooks/use-quick-add'
 import { createItem } from '@/lib/actions/create-item'
 import { updateItem } from '@/lib/actions/update-item'
 import { deleteItem } from '@/lib/actions/delete-item'
+import { createItemWithAIData } from '@/lib/actions/create-item-with-ai-data'
 import type { GiftItem } from '@/types/database'
 
 interface ItemFormModalProps {
@@ -18,10 +22,20 @@ interface ItemFormModalProps {
   item?: GiftItem
 }
 
+type ModalMode = 'ai' | 'manual'
+
 export function ItemFormModal({ open, onClose, listId, item }: ItemFormModalProps) {
   const router = useRouter()
   const isEditing = !!item
 
+  // Mode state
+  const [mode, setMode] = useState<ModalMode>('ai')
+
+  // AI Quick Add state
+  const { fetchAIData, isLoading: aiLoading, error: aiError, data: aiData, reset: resetAI, budget } = useQuickAdd()
+  const [aiItemName, setAiItemName] = useState('')
+
+  // Manual form state
   const [name, setName] = useState(item?.name || '')
   const [status, setStatus] = useState<'required' | 'optional'>(item?.status || 'required')
   const [notes, setNotes] = useState(item?.notes || '')
@@ -36,14 +50,15 @@ export function ItemFormModal({ open, onClose, listId, item }: ItemFormModalProp
       setName('')
       setNotes('')
       setIsHighValue(false)
-      // Keep status as-is for rapid entry
+      setAiItemName('')
+      resetAI()
     }
     setNameError('')
     setSubmitError('')
   }
 
   const handleClose = () => {
-    if (!isSubmitting) {
+    if (!isSubmitting && !aiLoading) {
       setName('')
       setStatus('required')
       setNotes('')
@@ -51,18 +66,75 @@ export function ItemFormModal({ open, onClose, listId, item }: ItemFormModalProp
       setNameError('')
       setSubmitError('')
       setShowDeleteConfirm(false)
+      setAiItemName('')
+      resetAI()
+      setMode('ai')
       onClose()
     }
   }
 
-  const handleSubmit = async (e: React.FormEvent, addAnother = false) => {
+  // AI Quick Add handlers
+  const handleAIFetch = async () => {
+    if (aiItemName.trim().length < 3) {
+      setSubmitError('Item name must be at least 3 characters')
+      return
+    }
+
+    setSubmitError('')
+    await fetchAIData(aiItemName)
+  }
+
+  const handleAISave = async () => {
+    if (!aiData) return
+
+    setIsSubmitting(true)
+    setSubmitError('')
+
+    try {
+      const result = await createItemWithAIData({
+        listId,
+        itemName: aiItemName,
+        aiData,
+      })
+
+      if (result.success) {
+        router.refresh()
+        resetForm()
+        handleClose()
+      } else {
+        setSubmitError(result.error || 'Failed to create item')
+      }
+    } catch (error) {
+      console.error('AI save error:', error)
+      setSubmitError('An unexpected error occurred')
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const handleEditManually = () => {
+    if (aiData) {
+      // Pre-fill manual form with AI data
+      setName(aiItemName)
+      setStatus(aiData.suggestedStatus)
+      setNotes(aiData.description)
+      setIsHighValue(aiData.priceRange.high > 100)
+    }
+    setMode('manual')
+  }
+
+  const handleRetryAI = () => {
+    resetAI()
+    setSubmitError('')
+  }
+
+  // Manual form handlers
+  const handleManualSubmit = async (e: React.FormEvent, addAnother = false) => {
     e.preventDefault()
 
-    // Clear previous errors
     setNameError('')
     setSubmitError('')
 
-    // Validate
     if (!name.trim()) {
       setNameError('Item name is required')
       return
@@ -100,9 +172,7 @@ export function ItemFormModal({ open, onClose, listId, item }: ItemFormModalProp
         router.refresh()
 
         if (addAnother && !isEditing) {
-          // Keep modal open, reset form for next item
           resetForm()
-          // Re-focus name input
           setTimeout(() => {
             document.getElementById('item-name')?.focus()
           }, 0)
@@ -159,13 +229,14 @@ export function ItemFormModal({ open, onClose, listId, item }: ItemFormModalProp
   return (
     <Modal open={open} onClose={handleClose}>
       <div className="bg-[#141414] rounded-lg p-6 w-full max-w-md border border-[#2d2d2d]">
+        {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl font-bold text-[#e4e4e7]">
             {isEditing ? 'Edit Gift Item' : 'Add Gift Item'}
           </h2>
           <button
             onClick={handleClose}
-            disabled={isSubmitting}
+            disabled={isSubmitting || aiLoading}
             className="text-[#71717a] hover:text-[#e4e4e7] transition-colors disabled:opacity-50"
             aria-label="Close"
           >
@@ -185,6 +256,59 @@ export function ItemFormModal({ open, onClose, listId, item }: ItemFormModalProp
             </svg>
           </button>
         </div>
+
+        {/* Mode Toggle (only for new items) */}
+        {!isEditing && (
+          <div className="mb-6 space-y-3">
+            <div className="flex gap-2">
+              <button
+                onClick={() => setMode('ai')}
+                disabled={aiLoading || isSubmitting}
+                className={`flex-1 py-2 px-4 rounded-md font-semibold transition-all ${
+                  mode === 'ai'
+                    ? 'bg-[#6366f1] text-white'
+                    : 'bg-[#2d2d2d] text-[#a1a1aa] hover:bg-[#3d3d3d]'
+                } disabled:opacity-50`}
+              >
+                ⚡ AI Quick Add
+              </button>
+              <button
+                onClick={() => setMode('manual')}
+                disabled={aiLoading || isSubmitting}
+                className={`flex-1 py-2 px-4 rounded-md font-semibold transition-all ${
+                  mode === 'manual'
+                    ? 'bg-[#6366f1] text-white'
+                    : 'bg-[#2d2d2d] text-[#a1a1aa] hover:bg-[#3d3d3d]'
+                } disabled:opacity-50`}
+              >
+                📝 Manual Entry
+              </button>
+            </div>
+
+            {/* Budget Indicator (AI mode only) */}
+            {mode === 'ai' && budget && (
+              <div className={`flex items-center justify-between px-3 py-2 rounded-md text-xs ${
+                budget.percentUsed >= 90
+                  ? 'bg-red-500/10 border border-red-500/30 text-red-400'
+                  : budget.percentUsed >= 70
+                    ? 'bg-amber-500/10 border border-amber-500/30 text-amber-400'
+                    : 'bg-[#1a1a1a] border border-[#2d2d2d] text-[#71717a]'
+              }`}>
+                <span className="flex items-center gap-1.5">
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                  {budget.percentUsed >= 90 ? (
+                    <span>Only ~{budget.estimatedRequestsRemaining.toLocaleString()} AI requests remaining</span>
+                  ) : (
+                    <span>~{budget.estimatedRequestsRemaining.toLocaleString()} AI requests this month</span>
+                  )}
+                </span>
+                <span className="font-medium">{budget.percentUsed}% used</span>
+              </div>
+            )}
+          </div>
+        )}
 
         {showDeleteConfirm ? (
           <div className="space-y-4">
@@ -213,8 +337,111 @@ export function ItemFormModal({ open, onClose, listId, item }: ItemFormModalProp
               </Button>
             </div>
           </div>
+        ) : mode === 'ai' && !isEditing ? (
+          /* AI Quick Add Mode */
+          <div className="space-y-4">
+            {submitError && (
+              <div className="bg-[#dc2626] bg-opacity-10 border border-[#dc2626] rounded-lg p-3">
+                <p className="text-[#dc2626] text-sm">{submitError}</p>
+              </div>
+            )}
+
+            {aiError && (
+              <div className="bg-amber-500/10 border border-amber-500 rounded-lg p-3">
+                <p className="text-amber-400 text-sm">{aiError}</p>
+                <button
+                  onClick={() => setMode('manual')}
+                  className="text-amber-300 hover:text-amber-200 text-sm font-medium mt-2 underline"
+                >
+                  Switch to Manual Entry
+                </button>
+              </div>
+            )}
+
+            {aiLoading ? (
+              <LoadingSpinner message="Finding details..." />
+            ) : aiData ? (
+              <>
+                <AIPreviewCard
+                  data={aiData}
+                  itemName={aiItemName}
+                  onRetry={handleRetryAI}
+                />
+                <div className="flex gap-3 pt-2">
+                  <Button
+                    type="button"
+                    onClick={handleClose}
+                    disabled={isSubmitting}
+                    className="bg-[#2d2d2d] hover:bg-[#3d3d3d] text-[#e4e4e7]"
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    type="button"
+                    onClick={handleEditManually}
+                    disabled={isSubmitting}
+                    className="bg-[#3d3d3d] hover:bg-[#4d4d4d] text-[#e4e4e7]"
+                  >
+                    Edit Manually
+                  </Button>
+                  <Button
+                    type="button"
+                    onClick={handleAISave}
+                    disabled={isSubmitting}
+                    className="bg-[#6366f1] hover:bg-[#5558e3] text-white disabled:bg-[#4c4f9f] flex-1"
+                  >
+                    {isSubmitting ? 'Adding...' : 'Add to List'}
+                  </Button>
+                </div>
+              </>
+            ) : (
+              <>
+                <div>
+                  <label htmlFor="ai-item-name" className="block text-sm font-medium text-[#e4e4e7] mb-2">
+                    What do you want to get?
+                  </label>
+                  <Input
+                    id="ai-item-name"
+                    type="text"
+                    value={aiItemName}
+                    onChange={(e) => setAiItemName(e.target.value)}
+                    placeholder="e.g., wireless headphones, cozy blanket..."
+                    autoFocus
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault()
+                        handleAIFetch()
+                      }
+                    }}
+                  />
+                  <p className="text-xs text-[#71717a] mt-2">
+                    💡 Examples: &quot;LEGO Star Wars set&quot;, &quot;espresso machine under $300&quot;, &quot;noise cancelling headphones&quot;
+                  </p>
+                </div>
+
+                <div className="flex gap-3 pt-2">
+                  <Button
+                    type="button"
+                    onClick={handleClose}
+                    className="bg-[#2d2d2d] hover:bg-[#3d3d3d] text-[#e4e4e7]"
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    type="button"
+                    onClick={handleAIFetch}
+                    disabled={aiItemName.trim().length < 3}
+                    className="bg-[#6366f1] hover:bg-[#5558e3] text-white disabled:bg-[#4c4f9f] flex-1"
+                  >
+                    Generate Details
+                  </Button>
+                </div>
+              </>
+            )}
+          </div>
         ) : (
-          <form onSubmit={(e) => handleSubmit(e, false)} className="space-y-4">
+          /* Manual Entry Mode */
+          <form onSubmit={(e) => handleManualSubmit(e, false)} className="space-y-4">
             {submitError && (
               <div className="bg-[#dc2626] bg-opacity-10 border border-[#dc2626] rounded-lg p-3">
                 <p className="text-[#dc2626] text-sm">{submitError}</p>
@@ -342,7 +569,7 @@ export function ItemFormModal({ open, onClose, listId, item }: ItemFormModalProp
                   </Button>
                   <Button
                     type="button"
-                    onClick={(e) => handleSubmit(e, true)}
+                    onClick={(e) => handleManualSubmit(e, true)}
                     disabled={isSubmitting}
                     className="bg-[#3d3d3d] hover:bg-[#4d4d4d] text-[#e4e4e7] disabled:bg-[#2d2d2d]"
                   >

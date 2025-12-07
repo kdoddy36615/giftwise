@@ -6,8 +6,6 @@
  * In production: Ready for integration with monitoring services (Sentry, LogRocket, etc.)
  */
 
-type LogLevel = 'info' | 'warn' | 'error'
-
 interface LogContext {
   [key: string]: unknown
 }

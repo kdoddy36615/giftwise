@@ -1,7 +1,6 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
-import type { BulkOpenTarget } from '@/types/dashboard'
 
 export interface ActionButtonsProps {
   selectedCount: number
