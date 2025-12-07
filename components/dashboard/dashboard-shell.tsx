@@ -38,7 +38,6 @@ export function DashboardShell({ lists, items, links }: DashboardShellProps) {
   const [isCreateListOpen, setIsCreateListOpen] = useState(false)
   const [editingList, setEditingList] = useState<GiftList | null>(null)
   const [isMarkingPurchased, setIsMarkingPurchased] = useState(false)
-  const [isUnmarking, setIsUnmarking] = useState(false)
 
   const { isBlurred } = usePrivacyBlur()
   const { openTabs } = useBulkOpen()
@@ -59,9 +58,6 @@ export function DashboardShell({ lists, items, links }: DashboardShellProps) {
   const {
     selections,
     toggleSelection,
-    selectAll,
-    selectRequired,
-    selectOptional,
     clearSelection,
   } = useSelection(lists, itemsWithLinks)
 
@@ -81,18 +77,6 @@ export function DashboardShell({ lists, items, links }: DashboardShellProps) {
   })
 
   // Action handlers
-  const handleSelectAll = () => {
-    if (activeListId) selectAll(activeListId)
-  }
-
-  const handleSelectRequired = () => {
-    if (activeListId) selectRequired(activeListId)
-  }
-
-  const handleSelectOptional = () => {
-    if (activeListId) selectOptional(activeListId)
-  }
-
   const handleClearSelection = () => {
     if (activeListId) clearSelection(activeListId)
   }
@@ -101,18 +85,6 @@ export function DashboardShell({ lists, items, links }: DashboardShellProps) {
     const count = selectedItems.length
     openTabs(selectedItems, 'cheapest')
     success(`Opening cheapest options for ${count} ${count === 1 ? 'item' : 'items'}`)
-  }
-
-  const handleOpenHighend = () => {
-    const count = selectedItems.length
-    openTabs(selectedItems, 'highend')
-    success(`Opening high-end options for ${count} ${count === 1 ? 'item' : 'items'}`)
-  }
-
-  const handleOpenAmazon = () => {
-    const count = selectedItems.length
-    openTabs(selectedItems, 'amazon')
-    success(`Opening Amazon links for ${count} ${count === 1 ? 'item' : 'items'}`)
   }
 
   const handleMarkPurchased = async () => {
@@ -133,27 +105,6 @@ export function DashboardShell({ lists, items, links }: DashboardShellProps) {
       }
     } finally {
       setIsMarkingPurchased(false)
-    }
-  }
-
-  const handleUnmarkPurchased = async () => {
-    setIsUnmarking(true)
-    try {
-      const itemIds = Array.from(selectedItemIds) as string[]
-      const count = itemIds.length
-      const result = await markItemsComplete(itemIds, false)
-      if (result.success) {
-        success(`Unmarked ${count} ${count === 1 ? 'item' : 'items'}`)
-        // Clear selection after unmarking
-        if (activeListId) clearSelection(activeListId)
-        // Refresh data to show updated state
-        router.refresh()
-      } else {
-        console.error('Failed to unmark items:', result.error)
-        error('Failed to unmark items. Please try again.')
-      }
-    } finally {
-      setIsUnmarking(false)
     }
   }
 
