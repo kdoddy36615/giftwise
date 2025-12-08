@@ -201,14 +201,24 @@ export function DashboardShell({ lists, items, links }: DashboardShellProps) {
           />
         </DashboardErrorBoundary>
 
-        <div className="flex gap-4 items-center">
+        {/* Desktop: FilterBar + Enhanced Add Button */}
+        <div className="hidden sm:flex gap-4 items-center">
           <FilterBar activeFilter={filter} onFilterChange={setFilter} />
+          <div className="w-px h-8 bg-[#2d2d2d]" />
           <button
             onClick={handleAddItem}
-            className="bg-[#6366f1] hover:bg-[#5558e3] text-white font-semibold px-4 py-2 rounded-lg transition-colors text-sm whitespace-nowrap"
+            className="bg-gradient-to-r from-[#6366f1] to-[#4f46e5] hover:from-[#5558e3] hover:to-[#4338ca] text-white font-bold px-6 py-3 rounded-lg shadow-lg shadow-[rgba(99,102,241,0.4)] transition-all hover:scale-105 whitespace-nowrap flex items-center gap-2"
           >
-            + Add Item
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+            Add Gift Item
           </button>
+        </div>
+
+        {/* Mobile: FilterBar only (Add button is FAB below) */}
+        <div className="sm:hidden">
+          <FilterBar activeFilter={filter} onFilterChange={setFilter} />
         </div>
       </div>
 
@@ -283,6 +293,17 @@ export function DashboardShell({ lists, items, links }: DashboardShellProps) {
           list={sharingList}
         />
       )}
+
+      {/* Mobile FAB for Add Item */}
+      <button
+        onClick={handleAddItem}
+        className="sm:hidden fixed bottom-6 right-6 z-20 w-14 h-14 bg-[#6366f1] hover:bg-[#5558e3] active:bg-[#4338ca] text-white rounded-full shadow-lg active:shadow-xl transition-all active:scale-95 flex items-center justify-center"
+        aria-label="Add gift item"
+      >
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+        </svg>
+      </button>
 
       {/* Toast Notifications */}
       <ToastContainer toasts={toasts} onClose={dismissToast} />
